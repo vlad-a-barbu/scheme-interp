@@ -1,5 +1,0 @@
-#lang sicp
-
-(define size 2)
-
-
