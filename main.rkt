@@ -3,21 +3,19 @@
 (require "pmatch.rkt")
 
 (define eval-expr
-  (lambda (expr)
+  (lambda (expr env)
     (pmatch expr
-            [,n (guard (number? n))
-              n]
-            [(add1 ,e)
-             (add1 (eval-expr e))]
-            [(sub1 ,e)
-             (sub1 (eval-expr e))]
-            [(* ,e1 ,e2)
-             (* (eval-expr e1)
-                (eval-expr e2))]
-            [(if ,t ,c ,a)
-             (if (eval-expr t)
-                 (eval-expr c)
-                 (eval-expr a))]
+            [,x (guard (symbol? x))
+                (env x)]
+            [(lambda (,x) ,body)
+             (lambda (arg)
+               (eval-expr body (lambda (y)
+                                 (if (eq? x y)
+                                     arg
+                                     (env y)))))]
+            [(,rator ,rand)
+             ((eval-expr rator env)
+              (eval-expr rand env))]
             )))
 
 
